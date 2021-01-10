@@ -1,0 +1,37 @@
+version: '3.4'
+
+services:
+  arev.ticketing.api:
+    image: ${DOCKER_REGISTRY-}arevticketing
+    hostname: arevticketingapi
+    ports:
+        - 3232:80
+    build:
+      context: .
+      dockerfile: Arev.Ticketing.Api/Dockerfile
+    depends_on:
+        - myrabbit
+
+  arev.ticketing.consumer.api:
+    image: ${DOCKER_REGISTRY-}arevticketingconsumer
+    hostname: arevticketingconsumerapi
+    build:
+      context: .
+      dockerfile: Arev.Ticketing.Consumer.Api/Dockerfile
+    ports:
+        - 8282
+    depends_on:
+        - myrabbit
+        - arev.ticketing.api
+  
+  myrabbit:
+    image: rabbitmq:3-management
+    hostname: "myrabbit"
+    environment:
+        RABBITMQ_DEFAULT_USER:  guest
+        RABBITMQ_DEFAULT_PASS:  guest
+        RABBITMQ_DEFAULT_VHOST: ticketQueue
+    ports:
+        - 5672:5672
+        - 15672:15672
+
